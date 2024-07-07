@@ -1,6 +1,7 @@
 import { View, Text, TextInput, StyleSheet, StatusBar, TouchableOpacity} from 'react-native'
 import React, {useState} from 'react'
 import { useNavigation } from '@react-navigation/native';
+import Config from "react-native-config";
 
 
 const LoginPage = ({route}) => {
@@ -12,34 +13,50 @@ const LoginPage = ({route}) => {
     const [name,setName] = useState("");
     const [password,setPassword] = useState("");
     const [showError, setShowError] = useState(false);
+    const [error, setError] = useState("*Please provide all info !");
 
-
+    const endpoint = !isLogin ? "register" : "login";
+    const url = `http://192.168.201.248:3000/api/${endpoint}`;
 
     const fetchData = async (data) => {
       try {
-        const res = await fetch(process.env.REACT_APP_SERVER_URL + "register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
+        const res = await fetch(
+          url,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
         const ans = await res.json();
+        if(res.ok){
+          navigation.navigate('HomePage',{
+            username:ans.username
+          })
+        }
+        else{
+          console.log(ans.message);
+          setError(ans.message);
+          setShowError(true);
+        }
       } catch (err) {
         console.log(err);
-        setShowError(true);
       }
     };
 
     const handleClick = async ()=>{
-      if(!email || !name || !password){
-        setShowError(true);
+      if(!name || !password){
         setName('');
         setEmail('')
         setPassword('')
+        setError("*Please provide all info !");
+        setShowError(true);
+        return;
       }
       const data = {
-        name:name,
+        username:name,
         email:email,
         password:password,
       }
@@ -47,7 +64,7 @@ const LoginPage = ({route}) => {
 
       setEmail('');
       setPassword('');
-      setShowError(false);
+      setName('')
     }
 
     return (
@@ -55,9 +72,8 @@ const LoginPage = ({route}) => {
         <Text className="text-white text-xl mt-4">
           {!isLogin ? "Welcome to Flow!" : "Welcome back to Flow!"}
         </Text>
-        {!isLogin && (
-          <View className="mt-8">
-            <Text className="text-white text-lg">Name</Text>
+        <View className="mt-8">
+            <Text className="text-white text-lg">Username</Text>
             <TextInput
               editable
               value={name}
@@ -65,9 +81,8 @@ const LoginPage = ({route}) => {
               onChangeText={(text) => setName(text)}
               className="border-b-2 border-b-[#47CF73] h-10 text-white"
             ></TextInput>
-          </View>
-        )}
-        <View className="mt-8">
+        </View>
+        {!isLogin && <View className="mt-8">
           <Text className="text-white text-lg">Email Address</Text>
           <TextInput
             editable
@@ -77,6 +92,7 @@ const LoginPage = ({route}) => {
             className="border-b-2 border-b-[#47CF73] h-10 text-white"
           ></TextInput>
         </View>
+        }
         <View className="mt-8">
           <Text className="text-white text-lg">Password</Text>
           <TextInput
@@ -89,9 +105,7 @@ const LoginPage = ({route}) => {
         </View>
         {showError && (
           <View>
-            <Text className="text-orange-400 mt-6 text-lg">
-              *Please provide all info !
-            </Text>
+            <Text className="text-orange-400 mt-6 text-lg">{error}</Text>
           </View>
         )}
         <View className="absolute bottom-16 w-full ml-4">

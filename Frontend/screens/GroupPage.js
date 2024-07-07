@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, StatusBar } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {Dimensions} from 'react-native'
 import TabViewExample from './TabViewExample';
 import BasketSvg from './BasketSvg';
@@ -10,59 +10,88 @@ import { useNavigation } from '@react-navigation/native';
 
 
 
+
 const airplane = require('../Images/airplane.jpeg')
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
-const GroupPage = () => {
+const GroupPage = ({route}) => {
 
     const navigation = useNavigation();
 
+    const {groupName, groupId} = route.params
+    console.log(groupId);
+
+    const [userList,setUserList] = useState([]);
+
+    const url = "http://192.168.201.248:3000/api/getUsers";
+
+    const fetchGroupList = async ()=>{
+      try {
+        const urlWithParams = `${url}?groupId=${encodeURIComponent(groupId)}`;
+        const res = await fetch(urlWithParams, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const ans = await res.json();
+        // console.log("mello")
+        //console.log(ans);
+        setUserList(ans.groupList);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    useEffect(()=>{
+      fetchGroupList();
+    },[]);
+
     const actions = [
-        {
-          text: "New Person",
-          icon: <UserSvg/>,
-          name: "new_person",
-          position: 1,
-          color:'white',
-          buttonSize:55,
-          textStyle:{
-            fontStyle: 'italic',
-            fontWeight: 'bold',
-            color:'#47CF73',
-          },
-          margin:0,
-          
+      {
+        text: "New Person",
+        icon: <UserSvg />,
+        name: "new_person",
+        position: 1,
+        color: "white",
+        buttonSize: 55,
+        textStyle: {
+          fontStyle: "italic",
+          fontWeight: "bold",
+          color: "#47CF73",
         },
-        {
-          text: "New Payment",
-          icon: <RuppeSvg/>,
-          name: "new_payment",
-          position: 2,
-          color:'white',
-          buttonSize:55,
-          textStyle:{
-            fontStyle: 'italic',
-            fontWeight: 'bold',
-            color:'#47CF73',
-          },
-          margin:0,
+        margin: 0,
+      },
+      {
+        text: "New Payment",
+        icon: <RuppeSvg />,
+        name: "new_payment",
+        position: 2,
+        color: "white",
+        buttonSize: 55,
+        textStyle: {
+          fontStyle: "italic",
+          fontWeight: "bold",
+          color: "#47CF73",
         },
-        {
-          text: "New Expense",
-          icon: <BasketSvg/>,
-          name: "new_expense",
-          position: 3,
-          color:'white',
-          buttonSize:55,
-          textStyle:{
-            fontStyle: 'italic',
-            fontWeight: 'bold',
-            color:'#47CF73',
-          },
-          margin:0,
+        margin: 0,
+      },
+      {
+        text: "New Expense",
+        icon: <BasketSvg />,
+        name: "new_expense",
+        position: 3,
+        color: "white",
+        buttonSize: 55,
+        textStyle: {
+          fontStyle: "italic",
+          fontWeight: "bold",
+          color: "#47CF73",
         },
-      ];
+        margin: 0,
+      },
+    ];
     
     return (
         <View className='bg-bgColor' style={styles.container}>
@@ -75,7 +104,7 @@ const GroupPage = () => {
                 />
             
                   
-                <Text className="mr-5 mb-1 text-white text-2xl font-bold">Goa Trip</Text>
+                <Text className="mr-5 mb-1 text-white text-2xl font-bold">{groupName}</Text>
                
             </View>
 			

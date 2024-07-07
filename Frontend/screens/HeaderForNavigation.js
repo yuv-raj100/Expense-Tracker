@@ -8,7 +8,7 @@ const h = Dimensions.get('window').height;
 const HeaderForNavigation = ({heading}) => {
 
     const navigation = useNavigation();
-
+    
     return (
         <View className='flex-row px-4 bg-[#47CF73] pt-2 justify-between ' style={styles.container}>
 
@@ -18,7 +18,15 @@ const HeaderForNavigation = ({heading}) => {
                 </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={()=>heading=='Next'?navigation.navigate('GroupMembers'):navigation.navigate('GroupPage')}>
+            <TouchableOpacity onPress={() => {
+                if (heading === 'Next') {
+                    navigation.navigate('GroupMembers');
+                } else {
+                    myFunction();
+                    navigation.navigate('HomePage');
+                }
+                }}
+            >
                 <Text className="text-white text-lg">
                     {heading!=null?heading:'Save'}
                 </Text>
@@ -35,4 +43,4 @@ const styles = StyleSheet.create({
         marginTop: StatusBar.currentHeight,
         height:h*0.075
     }
-  });
+});

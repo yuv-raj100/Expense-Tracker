@@ -5,19 +5,24 @@ import { NavigationContainer } from '@react-navigation/native';
 import UserDetails from './screens/UserDetails';
 import TransactionDetails from './screens/TransactionDetails';
 import NewExpense from './screens/NewExpense';
-import NewPerson from './screens/NewPerson';
+import NewPerson from './screens/NewGroup';
 import NewPayment from './screens/NewPayment';
 import HomePage from './screens/HomePage';
 import GroupMembers from './screens/GroupMembers';
 import IntroPage from './screens/IntroPage';
 import LoginPage from './screens/LoginPage';
+import { Provider } from 'react-redux';
+import appStore from './utils/appStore';
 
 
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
+
+  
     return (
+      <Provider store={appStore}>
         <NavigationContainer>
             <Stack.Navigator initialRouteName='IntroPage' >
                 <Stack.Screen name="GroupPage" component={GroupPage} options={{ headerShown: false }} />
@@ -32,7 +37,7 @@ export default function App() {
                 <Stack.Screen name='LoginPage' component={LoginPage} options={{ headerShown: false }} />     
             </Stack.Navigator>
         </NavigationContainer>
-       
+      </Provider>
     );
 }
 

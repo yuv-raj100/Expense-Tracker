@@ -7,7 +7,6 @@ const NewPerson = ({route}) => {
     const {heading} = route.params
 
     const [text, setText] = useState('');
-    
 
     return (
         <View>
@@ -23,7 +22,6 @@ const NewPerson = ({route}) => {
                 >
                 </TextInput>
             </View>
-
         </View>
     )
 }

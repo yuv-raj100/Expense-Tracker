@@ -1,31 +1,75 @@
 import { View, Text, StyleSheet, StatusBar, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import EditPencilSvg from '../svgs/EditPencilSvg'
 import DustbinSvg from '../svgs/DustbinSvg'
 import { FloatingAction } from "react-native-floating-action";
 import PlusSvg from './PlusSvg';
 import JoinSvg from '../svgs/JoinSvg';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 
 
-const HomePage = () => {
 
-    const [listOfGroups,setListOfGroups] = useState(["Goa Trip", "Mumbai", "RoadTrip"])
+const HomePage = ({route}) => {
+
+    // const {email} = route.params
+    const username="yuvraj"
+
+    const isFocused = useIsFocused();
+
+    const setUsername  = async ()=>{
+      try {
+        await AsyncStorage.setItem("user", username);
+      } catch (error) {
+        console.error("Error saving group name", error);
+      }
+    }
+    
+
+    const [listOfGroups,setListOfGroups] = useState([])
 
     const [edit,setEdit] = useState(false);
 
     const handleClick = (item)=>{
-        const newList = listOfGroups.filter((group)=>{
-        return item!=group
+          const newList = listOfGroups.filter((group)=>{
+          return item!=group
         })
 
         setListOfGroups(newList)
     }
-
     
+    const url = "http://192.168.201.248:3000/api/getGroups";
 
+    const fetchData = async () =>{
+        //  console.log("hello");
+      try{
+        const urlWithParams = `${url}?username=${encodeURIComponent(username)}`;
+        const res = await fetch(urlWithParams, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const ans = await res.json();
+        // console.log("mello")
+        // console.log(ans);
+        setListOfGroups(ans.groupList);
+      }
+      catch(error){
+        console.log(error);
+      }
+    }
+
+    useEffect(()=>{
+      const getGroups = async () => {
+        await fetchData();
+      };
+      // console.log("bellow");
+      getGroups();
+      setUsername();
+    },[isFocused])
+    
     const navigation = useNavigation();
 
     const actions = [
@@ -83,13 +127,12 @@ const HomePage = () => {
                       {
                           listOfGroups.map((group,idx)=>{
                             return (
-                              <TouchableOpacity key={idx} onPress={()=>navigation.navigate('GroupPage')}>
+                              <TouchableOpacity key={idx} onPress={()=>navigation.navigate('GroupPage',{groupName:group.groupName, groupId:group.groupId})}>
                                 <View
                                   className="border-b py-2 border-b-[#47CF73] flex-row justify-between"
-                                  
                                 >
                                   <Text className="text-lg text-white">
-                                    {group}
+                                    {group.groupName}
                                   </Text>
                                   {edit && (
                                     <TouchableOpacity
